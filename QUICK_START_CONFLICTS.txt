@@ -1,0 +1,228 @@
+================================================================================
+AI CONFLICT RESOLUTION LAB - QUICK START
+================================================================================
+
+YOUR APP NOW HAS 10 CONFLICT SCENARIOS
+================================================================================
+
+INSTALLED:
+- 10 realistic conflict scenarios (organizational, interpersonal, community, geopolitical, nonprofit)
+- Scenario selector UI (organized by category)
+- Mode toggle: "Select Scenario" vs "Custom Prompt"
+- Mock responses simulating how models approach conflicts
+
+READY TO USE:
+- No database setup needed
+- No API keys needed
+- No new dependencies
+- Works with: npm install && npm run dev
+
+================================================================================
+HOW TO USE IT NOW (TODAY)
+================================================================================
+
+1. DOWNLOAD THE ZIP FILE
+   [Get ai-learning-platform.zip from outputs]
+
+2. UNZIP & INSTALL
+   unzip ai-learning-platform.zip
+   cd ai-learning-platform
+   npm install
+
+3. RUN IT
+   npm run dev
+   
+4. OPEN IN BROWSER
+   http://localhost:3000
+
+5. USE IT
+   - Click "Select Scenario" (should be default)
+   - Pick a conflict (e.g., "Remote Work Policy Standoff")
+   - Select 2-4 models to compare (Claude is default)
+   - Click "Compare Models"
+   - See how each model approaches the conflict
+   - Save results if you want
+
+THAT'S IT. You're done.
+
+================================================================================
+THE 10 SCENARIOS
+================================================================================
+
+ORGANIZATIONAL (3)
+  1. Resource Allocation Dispute
+  2. Remote Work Policy Standoff
+  3. Acquisition Integration Crisis
+
+INTERPERSONAL (2)
+  4. Inheritance and Business Legacy
+  5. Co-Parenting School Choice
+
+COMMUNITY (2)
+  6. Affordable Housing vs Neighborhood Preservation
+  7. Water Rights in Drought
+
+GEOPOLITICAL (2)
+  8. Tech Company and Government Privacy
+  9. Trade Tariff Negotiation
+
+NONPROFIT (1)
+  10. Nonprofit Mission Creep vs Growth
+
+Each scenario includes:
+- Full narrative (200-500 words)
+- Key stakeholders & tensions
+- Learning focus tags (e.g., "power imbalance," "interests vs positions")
+
+================================================================================
+USE IN CLASSROOM (5 MINUTES)
+================================================================================
+
+BEFORE CLASS:
+1. Run: npm run dev
+2. Browser ready at http://localhost:3000
+3. Test once (takes 30 seconds)
+
+DURING CLASS:
+1. Select scenario (e.g., "Remote Work Policy")
+2. Read description to class (30 seconds)
+3. Select 2 models (Claude + GPT-4 is good)
+4. Click "Compare Models" (waits 2 seconds)
+5. Show results on projector (displayed side-by-side)
+6. Discuss: "Which model better identified underlying interests?"
+
+TIME: 5 minutes total
+SETUP: 30 seconds
+
+================================================================================
+WHAT YOU GET WITH THIS VERSION
+================================================================================
+
+✓ Scenario selector (browse by context)
+✓ Mode toggle (scenarios vs custom prompts)
+✓ Compare multiple models on same conflict
+✓ Speed & cost metrics
+✓ Save & load experiments
+✓ No database required
+✓ No API costs
+✓ Ready to teach with
+
+✗ Not included (for later):
+  - Database persistence (can add Supabase later)
+  - Real API calls (can add when budget allows)
+  - Advanced evaluation rubrics (you can create these)
+
+================================================================================
+FILES YOU RECEIVED
+================================================================================
+
+KEY FILES:
+  lib/scenarioData.ts        ← 10 scenarios (change here to add more)
+  lib/mockData.ts            ← Mock responses (simulates each model)
+  app/page.tsx               ← UI with scenario selector
+
+DOCUMENTATION:
+  README_CONFLICTS.md        ← Teaching guide (how to use in class)
+  SCENARIOS_SETUP.md         ← Scenario details & database options
+  TEACHING_GUIDE.md          ← Lesson plans & discussion prompts
+  SETUP.md                   ← General technical setup
+  QUICK_REFERENCE.md         ← Technical quick ref
+
+SETUP:
+  migrations/001_create_scenarios.sql  ← For Supabase (optional, later)
+
+================================================================================
+WHAT CHANGED FROM BEFORE
+================================================================================
+
+ADDED:
+  - Conflict scenario selector UI
+  - Mode toggle (scenario vs custom prompt)
+  - 10 realistic conflict scenarios in TypeScript
+  - Generic conflict resolution responses for models
+  - 3 new documentation files
+
+UNCHANGED:
+  - Model comparison logic
+  - Cost/speed metrics
+  - Save/load experiments
+  - API structure
+  - Deployment process
+
+NO BREAKING CHANGES:
+  - All existing features still work
+  - No new dependencies
+  - Can still use custom prompts
+  - Can still compare any models
+
+================================================================================
+FIRST TIME USING SCENARIOS?
+================================================================================
+
+RECOMMENDED SCENARIO: "Remote Work Policy Standoff"
+
+WHY:
+  - Relatable (everyone works somewhere)
+  - Balanced (both sides have valid points)
+  - Real consequences (employees already relocated)
+  - Good discussion (data vs perception)
+
+FIRST CLASS ACTIVITY:
+  1. Load app
+  2. Select "Remote Work Policy"
+  3. Select Claude + GPT
+  4. Compare
+  5. Ask: "Which model identified what people ACTUALLY care about?"
+  6. Discuss: Position = "3 days in office" vs Interest = "I'm worried collaboration is suffering"
+
+TIME: 10 minutes
+
+================================================================================
+NEXT STEPS (OPTIONAL - NOT NOW)
+================================================================================
+
+WEEK 1: Test with students
+  - Try scenarios in 2-3 classes
+  - Gather feedback: What works? What's confusing?
+
+WEEK 2: Add custom scenarios (if desired)
+  - Create scenarios from your discipline
+  - Edit lib/scenarioData.ts and add to array
+  - Refresh app—they appear instantly
+
+WEEK 3+: Optional upgrades
+  - Move scenarios to Supabase (for easier updates)
+  - Add real API calls (to use actual Claude, GPT)
+  - Build evaluation rubrics (for assessing model quality)
+
+THESE ARE ALL OPTIONAL. Everything works great as-is.
+
+================================================================================
+QUESTIONS?
+================================================================================
+
+TEACHING:              → See TEACHING_GUIDE.md
+SCENARIOS:            → See SCENARIOS_SETUP.md or README_CONFLICTS.md
+TECHNICAL SETUP:      → See SETUP.md
+QUICK REFERENCE:      → See QUICK_REFERENCE.md
+CHANGES FROM V1:      → See CHANGES_SUMMARY.md
+
+================================================================================
+YOU'RE ALL SET
+================================================================================
+
+Everything you need is in the zip file.
+
+Next action:
+  1. Download ai-learning-platform.zip
+  2. unzip it
+  3. npm install
+  4. npm run dev
+  5. Open http://localhost:3000
+  6. Pick a scenario
+  7. Click "Compare Models"
+  8. You're live
+
+Estimated time to first working demo: 5 minutes
+
+Good luck! 🚀
