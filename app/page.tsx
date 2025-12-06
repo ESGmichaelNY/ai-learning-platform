@@ -633,6 +633,135 @@ export default function ComparisonInterface() {
                   </div>
                 </div>
 
+                {/* Comparison Analysis Section */}
+                {results.responses.filter(r => !r.error).length > 1 && (
+                  <div className="bg-white rounded-lg shadow p-8 mb-8">
+                    <h2 className="text-2xl font-bold mb-6">Comparison Analysis</h2>
+
+                    {/* Metrics Comparison Table */}
+                    <div className="mb-8">
+                      <h3 className="text-lg font-semibold mb-4">Performance Metrics</h3>
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr className="bg-gray-100">
+                              <th className="border border-gray-300 px-4 py-2 text-left">Model</th>
+                              <th className="border border-gray-300 px-4 py-2 text-right">Speed (s)</th>
+                              <th className="border border-gray-300 px-4 py-2 text-right">Cost ($)</th>
+                              <th className="border border-gray-300 px-4 py-2 text-right">Tokens</th>
+                              <th className="border border-gray-300 px-4 py-2 text-right">Response Length</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {results.responses.filter(r => !r.error).map(response => {
+                              const model = MODELS.find(m => m.id === response.modelId)
+                              const responseLength = response.response?.length || 0
+                              return (
+                                <tr key={response.modelId} className="hover:bg-gray-50">
+                                  <td className="border border-gray-300 px-4 py-2 font-medium">{model?.name}</td>
+                                  <td className="border border-gray-300 px-4 py-2 text-right">
+                                    {response.speed?.toFixed(2)}
+                                    {response.speedRanking === 1 && (
+                                      <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Fastest</span>
+                                    )}
+                                  </td>
+                                  <td className="border border-gray-300 px-4 py-2 text-right">
+                                    ${response.cost?.toFixed(4)}
+                                    {response.costRanking === 1 && (
+                                      <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Cheapest</span>
+                                    )}
+                                  </td>
+                                  <td className="border border-gray-300 px-4 py-2 text-right">{response.tokens}</td>
+                                  <td className="border border-gray-300 px-4 py-2 text-right">{responseLength} chars</td>
+                                </tr>
+                              )
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* Response Length Comparison */}
+                    <div className="mb-8">
+                      <h3 className="text-lg font-semibold mb-4">Response Length Comparison</h3>
+                      <div className="space-y-3">
+                        {results.responses.filter(r => !r.error).map(response => {
+                          const model = MODELS.find(m => m.id === response.modelId)
+                          const responseLength = response.response?.length || 0
+                          const maxLength = Math.max(...results.responses.filter(r => !r.error).map(r => r.response?.length || 0))
+                          const percentage = maxLength > 0 ? (responseLength / maxLength) * 100 : 0
+
+                          return (
+                            <div key={response.modelId}>
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="font-medium">{model?.name}</span>
+                                <span className="text-gray-600">{responseLength} characters</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-4">
+                                <div
+                                  className="bg-blue-600 h-4 rounded-full transition-all"
+                                  style={{ width: `${percentage}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Key Insights */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">Key Insights</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Fastest Model */}
+                        {(() => {
+                          const fastest = results.responses
+                            .filter(r => !r.error && r.speed)
+                            .sort((a, b) => (a.speed || 0) - (b.speed || 0))[0]
+                          const fastestModel = MODELS.find(m => m.id === fastest?.modelId)
+                          return fastest ? (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                              <div className="text-sm text-blue-600 font-semibold mb-1">Fastest Response</div>
+                              <div className="text-lg font-bold text-blue-900">{fastestModel?.name}</div>
+                              <div className="text-sm text-blue-700">{fastest.speed?.toFixed(2)}s</div>
+                            </div>
+                          ) : null
+                        })()}
+
+                        {/* Cheapest Model */}
+                        {(() => {
+                          const cheapest = results.responses
+                            .filter(r => !r.error && r.cost !== undefined)
+                            .sort((a, b) => (a.cost || 0) - (b.cost || 0))[0]
+                          const cheapestModel = MODELS.find(m => m.id === cheapest?.modelId)
+                          return cheapest ? (
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                              <div className="text-sm text-green-600 font-semibold mb-1">Most Cost-Effective</div>
+                              <div className="text-lg font-bold text-green-900">{cheapestModel?.name}</div>
+                              <div className="text-sm text-green-700">${cheapest.cost?.toFixed(4)}</div>
+                            </div>
+                          ) : null
+                        })()}
+
+                        {/* Longest Response */}
+                        {(() => {
+                          const longest = results.responses
+                            .filter(r => !r.error && r.response)
+                            .sort((a, b) => (b.response?.length || 0) - (a.response?.length || 0))[0]
+                          const longestModel = MODELS.find(m => m.id === longest?.modelId)
+                          return longest ? (
+                            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                              <div className="text-sm text-purple-600 font-semibold mb-1">Most Detailed</div>
+                              <div className="text-lg font-bold text-purple-900">{longestModel?.name}</div>
+                              <div className="text-sm text-purple-700">{longest.response?.length} chars</div>
+                            </div>
+                          ) : null
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="text-center">
                   <button
                     onClick={handleBackToScenarios}

@@ -5,7 +5,15 @@
       "Bash(test:*)",
       "Bash(gh repo create:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npm install:*)",
+      "Bash(git push:*)",
+      "Bash(lsof:*)",
+      "Bash(ps:*)",
+      "Bash(ollama list:*)",
+      "Bash(npm search:*)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

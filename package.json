@@ -14,6 +14,7 @@
     "@supabase/supabase-js": "^2.39.0",
     "autoprefixer": "^10.4.17",
     "next": "^14.1.0",
+    "ollama": "^0.6.3",
     "openai": "^6.9.1",
     "postcss": "^8.4.33",
     "react": "^18.3.1",

@@ -20,7 +20,10 @@ export const MODELS = [
   { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet', provider: 'Anthropic' },
   { id: 'gpt-4', name: 'GPT-4', provider: 'OpenAI' },
   { id: 'gemini-pro', name: 'Gemini Pro', provider: 'Google' },
-  { id: 'llama-2', name: 'Llama 2 (70B)', provider: 'Meta' }
+  { id: 'phi3:latest', name: 'Phi-3 (3.8B) - Fastest', provider: 'Ollama (Local)' },
+  { id: 'llama3:latest', name: 'Llama 3 (8B)', provider: 'Ollama (Local)' },
+  { id: 'mistral:latest', name: 'Mistral (7B)', provider: 'Ollama (Local)' },
+  { id: 'qwen3-coder:480b-cloud', name: 'Qwen 3 Coder (480B Cloud)', provider: 'Ollama (Local)' }
 ]
 
 // This is a simplified version - in production, you'd have responses for each full scenario

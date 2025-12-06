@@ -3,6 +3,11 @@ import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { Ollama } from 'ollama'
+import http from 'http'
+
+// Increase timeout for large models (10 minutes)
+export const maxDuration = 600
 
 // Initialize API clients
 const anthropic = new Anthropic({
@@ -15,12 +20,18 @@ const openai = new OpenAI({
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '')
 
+// Initialize Ollama - use direct HTTP requests instead of SDK's fetch
+const ollama = new Ollama({
+  host: process.env.OLLAMA_HOST || 'http://localhost:11434'
+})
+
 // Pricing per 1K tokens (approximate, check latest pricing)
+// Ollama models are free (local)
 const PRICING = {
   'claude-3-sonnet': { input: 0.003, output: 0.015 },
   'gpt-4': { input: 0.03, output: 0.06 },
   'gemini-pro': { input: 0.00025, output: 0.0005 },
-  'llama-2': { input: 0.0002, output: 0.0002 }
+  'ollama': { input: 0, output: 0 }  // Free - runs locally
 }
 
 interface ModelResponse {
@@ -43,7 +54,7 @@ async function callClaude(prompt: string): Promise<ModelResponse> {
     }
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-3-5-sonnet-20240620',
       max_tokens: 1024,
       messages: [{ role: 'user', content: prompt }]
     })
@@ -154,13 +165,108 @@ async function callGemini(prompt: string): Promise<ModelResponse> {
   }
 }
 
-async function callLlama(prompt: string): Promise<ModelResponse> {
-  // Llama 2 requires a third-party provider like Together AI, Replicate, or Groq
-  // For now, return a helpful error message
-  return {
-    modelId: 'llama-2',
-    error: 'Llama 2 requires additional setup with Together AI or Replicate. See documentation.'
-  }
+async function callOllama(prompt: string, modelId: string): Promise<ModelResponse> {
+  const startTime = Date.now()
+
+  return new Promise((resolve) => {
+    const postData = JSON.stringify({
+      model: modelId,
+      prompt: prompt,
+      stream: true,
+      options: {
+        num_predict: 512  // Reduced for faster responses
+      }
+    })
+
+    const options = {
+      hostname: 'localhost',
+      port: 11434,
+      path: '/api/generate',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      },
+      timeout: 600000  // 10 minute timeout
+    }
+
+    const req = http.request(options, (res) => {
+      let fullText = ''
+      let totalTokens = 0
+      let promptTokens = 0
+      let evalTokens = 0
+      let buffer = ''
+
+      res.on('data', (chunk) => {
+        buffer += chunk.toString()
+        const lines = buffer.split('\n')
+
+        // Keep the last incomplete line in the buffer
+        buffer = lines.pop() || ''
+
+        for (const line of lines) {
+          if (!line.trim()) continue
+
+          try {
+            const json = JSON.parse(line)
+
+            if (json.response) {
+              fullText += json.response
+            }
+
+            if (json.done) {
+              promptTokens = json.prompt_eval_count || 0
+              evalTokens = json.eval_count || 0
+              totalTokens = promptTokens + evalTokens
+            }
+          } catch (parseError) {
+            // Skip invalid JSON
+            continue
+          }
+        }
+      })
+
+      res.on('end', () => {
+        const duration = (Date.now() - startTime) / 1000
+        const estimatedTokens = totalTokens || Math.ceil(fullText.length / 4)
+
+        resolve({
+          modelId,
+          response: fullText,
+          tokens: estimatedTokens,
+          speed: duration,
+          cost: 0
+        })
+      })
+
+      res.on('error', (error) => {
+        console.error('Ollama response error:', error)
+        resolve({
+          modelId,
+          error: error.message || 'Failed to get Ollama response'
+        })
+      })
+    })
+
+    req.on('error', (error) => {
+      console.error('Ollama request error:', error)
+      resolve({
+        modelId,
+        error: error.message || 'Failed to connect to Ollama. Is it running?'
+      })
+    })
+
+    req.on('timeout', () => {
+      req.destroy()
+      resolve({
+        modelId,
+        error: 'Request timed out after 10 minutes. Model may be too slow.'
+      })
+    })
+
+    req.write(postData)
+    req.end()
+  })
 }
 
 export async function POST(request: NextRequest) {
@@ -176,6 +282,11 @@ export async function POST(request: NextRequest) {
 
     // Call all models in parallel
     const responsePromises = models.map(async (modelId: string) => {
+      // Check if it's an Ollama model (contains ':' like 'llama3.1:8b')
+      if (modelId.includes(':') || ['mixtral:latest', 'llama3.1:8b', 'qwen2.5:32b', 'deepseek-r1:32b'].includes(modelId)) {
+        return await callOllama(prompt, modelId)
+      }
+
       switch (modelId) {
         case 'claude-3-sonnet':
           return await callClaude(prompt)
@@ -183,8 +294,6 @@ export async function POST(request: NextRequest) {
           return await callGPT4(prompt)
         case 'gemini-pro':
           return await callGemini(prompt)
-        case 'llama-2':
-          return await callLlama(prompt)
         default:
           return {
             modelId,
