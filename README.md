@@ -4,20 +4,23 @@ An interactive web application for faculty to learn how different AI models resp
 
 ## Features
 
-### Current MVP
+### Current Capabilities
+- **Real AI Integration**: Live comparison with Claude, GPT-4, Gemini, and Llama models
+- **Local Model Support**: Run Ollama models locally for privacy and zero API costs
 - **Easy Comparison**: Enter a prompt, select models, see side-by-side outputs
-- **Cost & Speed Metrics**: Normalized rankings show which model is fastest/cheapest
+- **Cost & Speed Metrics**: Real-time rankings showing actual performance and costs
+- **Custom Instructions**: Personalized Gemini model behavior with custom instructions
 - **Example Prompts**: Quick-start templates across education, business, and research
 - **Save Experiments**: Store and review past comparisons
-- **No Costs**: Mock data means zero API spend during development
-- **Backend Proxy**: API keys stay server-side (ready for real API integration)
+- **Backend Proxy**: API keys stay server-side for security
 
 ### Architecture Highlights
 - Built with Next.js 14 (App Router)
 - TypeScript for type safety
 - Tailwind CSS for styling
 - Supabase for persistence
-- Ready for real API integration
+- Real-time API integration with major AI providers
+- Ollama integration for local model deployment
 
 ## Quick Start
 
@@ -34,13 +37,24 @@ An interactive web application for faculty to learn how different AI models resp
    npm install
    ```
 
-2. **Configure Supabase**
+2. **Configure Environment**
    - Create project at https://supabase.com
    - Copy `.env.local.example` → `.env.local`
    - Add your Supabase URL and anon key
    - Create the required tables (see SETUP.md)
+   - Add API keys for AI providers you want to use:
+     ```
+     ANTHROPIC_API_KEY=sk-ant-...
+     OPENAI_API_KEY=sk-...
+     GOOGLE_API_KEY=...
+     ```
 
-3. **Run Locally**
+3. **Optional: Install Ollama** (for local models)
+   - Download from https://ollama.com
+   - Pull models: `ollama pull llama2` or `ollama pull codellama`
+   - Models run locally with no API costs
+
+4. **Run Locally**
    ```bash
    npm run dev
    ```
@@ -76,11 +90,12 @@ ai-learning-platform/
 
 ## Development Notes
 
-### Mock Data Strategy
-The app currently uses mock responses in `lib/mockData.ts`. This allows:
-- **Zero Cost**: Test the UI without spending on API calls
-- **Predictable Results**: Same output every time (good for testing)
-- **Easy Swap**: Replace mock data with real API calls when ready
+### API Integration
+The app now uses real AI APIs through secure backend routes:
+- **Claude**: Anthropic SDK via `/api/compare` route
+- **GPT-4**: OpenAI SDK for ChatGPT models
+- **Gemini**: Google Generative AI SDK with custom instructions
+- **Ollama**: Local models for privacy-first deployment
 
 ### Backend Proxy Pattern
 API keys are never exposed to the frontend:
@@ -98,40 +113,36 @@ Currently scaffolded for saving experiments:
 
 See `SETUP.md` for SQL to create tables.
 
-## Next Phase: Real API Integration
+## Using Local Models with Ollama
 
-When ready to use actual models:
+Ollama allows you to run models locally for complete privacy and zero API costs:
 
-1. **Add SDK packages**:
+1. **Install Ollama**:
+   - Download from https://ollama.com
+   - Install for your platform
+
+2. **Pull models**:
    ```bash
-   npm install @anthropic-ai/sdk openai @google/generative-ai
+   ollama pull llama2
+   ollama pull codellama
+   ollama pull mistral
    ```
 
-2. **Update `/app/api/compare/route.ts`** to replace mock data with real calls
-
-3. **Set API keys in `.env.local`**:
-   ```
-   ANTHROPIC_API_KEY=sk-...
-   OPENAI_API_KEY=sk-...
-   GOOGLE_API_KEY=...
+3. **Verify Ollama is running**:
+   ```bash
+   ollama list
    ```
 
-4. **Implement rate limiting** to control costs
+4. **Use in the app**: Local models appear alongside cloud models in the comparison interface
 
-Example: Calling Claude via backend proxy
-```typescript
-import Anthropic from "@anthropic-ai/sdk"
+## Custom Gemini Instructions
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
-})
+You can customize Gemini's behavior with system instructions:
 
-const response = await client.messages.create({
-  model: "claude-3-sonnet-20240229",
-  max_tokens: 1024,
-  messages: [{ role: "user", content: prompt }]
-})
-```
+1. Create/edit `.gemini-instructions` in the project root
+2. Add custom instructions (e.g., "You are an expert educator...")
+3. Restart the dev server
+4. Gemini will use these instructions for all responses
 
 ## Deployment
 
@@ -144,16 +155,17 @@ Set environment variables in Vercel dashboard.
 ### Other Platforms
 Works on any Node.js host (Railway, Render, Heroku).
 
-## Scaffolded Features (Not Yet Implemented)
+## Roadmap
 
-These features are designed into the data model but not active in the UI:
+Potential future enhancements:
 
-- [ ] Saving experiments to Supabase (UI ready, just needs DB calls)
-- [ ] Loading past experiments from database
+- [ ] Enhanced experiment saving/loading UI
 - [ ] Batch testing (multiple prompts at once)
-- [ ] Custom model parameters (temperature, max_tokens)
+- [ ] Custom model parameters (temperature, max_tokens) in UI
 - [ ] Export results to CSV
 - [ ] Sharing experiments with other faculty
+- [ ] Usage analytics and cost tracking
+- [ ] Support for additional model providers
 
 ## For Faculty: Learning Outcomes
 
